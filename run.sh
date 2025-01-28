@@ -19,11 +19,12 @@ echo "Stopping and removing existing container (if any)..."
 docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
 docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
-# Pull the latest pre-built image
-echo "Pulling the latest image..."
-if ! docker pull "$IMAGE_NAME"; then
-    echo "Error: Failed to pull the image. Exiting."
-    exit 1
+# Attempt to pull the latest image
+echo "Attempting to pull the latest image..."
+if docker pull "$IMAGE_NAME"; then
+    echo "Successfully pulled the latest image."
+else
+    echo "Warning: Failed to pull the image. Using the existing local image, if available."
 fi
 
 # Prepare the run command
