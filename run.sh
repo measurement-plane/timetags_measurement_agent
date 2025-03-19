@@ -13,18 +13,18 @@ WR_PORT="/dev/ttyUSB0"               # Serial port for White Rabbit
 TIME_TAGGER_SERIAL="2138000XHS"      # Serial number for the Time Tagger
 PPS_CHAN="1"
 TRIGGER_LEVEL="0.1"
+DEAD_TIME="0"
 
 # Stop and remove any running container with the same name
 echo "Stopping and removing existing container (if any)..."
 docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
 docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
-# Attempt to pull the latest image
-echo "Attempting to pull the latest image..."
-if docker pull "$IMAGE_NAME"; then
-    echo "Successfully pulled the latest image."
-else
-    echo "Warning: Failed to pull the image. Using the existing local image, if available."
+# Pull the latest pre-built image
+echo "Pulling the latest image..."
+if ! docker pull "$IMAGE_NAME"; then
+    echo "Error: Failed to pull the image. Exiting."
+    exit 1
 fi
 
 # Prepare the run command
@@ -39,6 +39,7 @@ DOCKER_CMD+=" -e WR_PORT=\"$WR_PORT\""
 DOCKER_CMD+=" -e TIME_TAGGER_SERIAL=\"$TIME_TAGGER_SERIAL\""
 DOCKER_CMD+=" -e PPS_CHAN=\"$PPS_CHAN\""
 DOCKER_CMD+=" -e TRIGGER_LEVEL=\"$TRIGGER_LEVEL\""
+DOCKER_CMD+=" -e DEAD_TIME=\"$DEAD_TIME\""
 DOCKER_CMD+=" --privileged"
 
 # Add the image name
